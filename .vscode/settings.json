@@ -1,0 +1,10 @@
+{
+    "editor.fontFamily": "Fira Code",
+    "editor.renderLineHighlight": "gutter",
+    "editor.fontLigatures": true, 
+    "workbench.iconTheme": "material-icon-theme",
+    "explorer.compactFolders": false,
+    "breadcrumbs.enabled": false,
+    "editor.minimap.enabled":false,
+    "workbench.colorTheme":"Dracula Theme"
+}
