@@ -1,12 +1,29 @@
-import { GetServerSideProps } from 'next'
-
 import Head from 'next/head'
-import styles from './home.module.scss'
+import { GetStaticProps } from 'next'
 
 import { SubscribeButton } from '../components/SubscribeButton';
+import { stripe } from '../services/stripe';
+
+import styles from './home.module.scss'
+
+// getServerSideProps - SSR - informações dinâmicas, dados de usuários
+// getStaticProps - SSG - quando o conteudo nao muda com frequencia
+// Client-side - conteudo que muda com muita frequencia, toda vez que o usuario interage
+
+// Post de Bloc
+
+// Conteudo estático - SSG
+// Comentários - Client-side
+
+interface HomeProps {
+  product: {
+    priceId: string;
+    amount: number;
+  }
+}
 
 
-export default function Home() {
+export default function Home({ product }: HomeProps) {
   return (
     <>
       <Head>
@@ -19,10 +36,10 @@ export default function Home() {
           <h1>News about the <span>React</span> world.</h1>
           <p>
             Get access to all the publications <br />
-            <span>for $9,90 month</span>
+            <span>for {product.amount} month</span>
           </p>
 
-          <SubscribeButton />
+          <SubscribeButton priceId={product.priceId} />
         </section>
 
         <img src="/images/avatar.svg" alt="Girl Coding" />
@@ -31,12 +48,25 @@ export default function Home() {
   );
 }
 
+export const getStaticProps: GetStaticProps = async () => {
 
-export const getServicesSideProps: GetServerSideProps = async () => {
+  const price = await stripe.prices.retrieve('price_1SEBXmPqoUV9if1mRXw2idgT', {
+    expand: ['product']
+  })
+
+  const product = {
+    priceId: price.id,
+    amount: new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(price.unit_amount / 100),
+  }
+
   return {
     props: {
-      nome: 'Gustavo'
-    }
+      product
+    },
+    revalidate: 60 * 60 * 24 //24hours
 
   }
 
